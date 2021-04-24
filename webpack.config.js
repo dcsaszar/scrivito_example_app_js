@@ -22,11 +22,13 @@ if (endpoint) {
   headersCsp["script-src"].push(`https://${endpoint}`);
 }
 
-const buildPath = "build";
-
 function webpackConfig(env = {}) {
   const isProduction = env.production;
   const isPrerendering = process.env.SCRIVITO_PRERENDER;
+  const { isNode } = env;
+  const webTarget = isProduction ? ["web", "es5"] : "web";
+  const target = isNode ? "node" : webTarget;
+  const buildPath = isNode ? "buildNode" : "build";
 
   if (
     !process.env.SCRIVITO_TENANT ||
@@ -49,8 +51,8 @@ function webpackConfig(env = {}) {
   return {
     mode: isProduction ? "production" : "development",
     context: path.join(__dirname, "src"),
-    entry: generateEntry({ isPrerendering }),
-    target: isProduction ? ["web", "es5"] : "web",
+    entry: generateEntry({ isPrerendering, isNode }),
+    target,
     module: {
       rules: [
         {
@@ -133,7 +135,17 @@ function webpackConfig(env = {}) {
   };
 }
 
-function generateEntry({ isPrerendering }) {
+function generateEntry({ isPrerendering, isNode }) {
+  if (isNode) {
+    return isPrerendering
+      ? {
+          prerender: {
+            import: "./prerender.js",
+            filename: "assets/[name].js",
+          },
+        }
+      : {};
+  }
   const entry = {
     index: "./index.js",
     tracking: "./tracking.js",
@@ -175,9 +187,24 @@ function generatePlugins({ isProduction, isPrerendering, scrivitoOrigin }) {
     }),
     new HtmlWebpackPlugin({
       filename: "catch_all_index.html",
-      template: "catch_all_index.html",
+      template: "index.html.ejs",
       chunks: ["index"],
       inject: false, // needs custom order of script tags
+    }),
+    new HtmlWebpackPlugin({
+      filename: "_page_template.html",
+      template: "index.html.ejs",
+      scriptLoading: "blocking",
+      chunks: ["index"],
+      inject: false,
+      minify: false,
+      prerender: true,
+      templateParameters: (_compilation, _assets, tags, options) => {
+        tags.bodyTags.forEach(({ attributes }) => {
+          attributes.async = true;
+        });
+        return { htmlWebpackPlugin: { tags, options } };
+      },
     }),
     new HtmlWebpackPlugin({
       filename: "_scrivito_extensions.html",
@@ -231,4 +258,8 @@ function devServerCspHeader() {
   return builder({ directives });
 }
 
-module.exports = webpackConfig;
+function webpackConfigNode(env = {}) {
+  return webpackConfig({ ...env, isNode: true });
+}
+
+module.exports = [webpackConfig, webpackConfigNode];

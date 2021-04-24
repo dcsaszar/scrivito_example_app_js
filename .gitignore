@@ -1,6 +1,8 @@
 build
+buildNode
 build.zip
 buildPrerendered
+buildNodePrerendered
 node_modules
 tmp
 .env

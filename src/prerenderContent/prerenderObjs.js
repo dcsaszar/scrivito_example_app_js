@@ -4,6 +4,7 @@ import { chunk } from "lodash-es";
 import prerenderObj from "./prerenderObj";
 
 export default async function prerenderObjs(
+  pageTemplate,
   objClassesBlacklist,
   storeResult,
   reportError
@@ -21,7 +22,7 @@ export default async function prerenderObjs(
   await asyncForEachSequential(objsGroups, async (objsGroup) =>
     asyncForEach(objsGroup, async (obj) => {
       try {
-        const prerenderedFiles = await prerenderObj(obj);
+        const prerenderedFiles = await prerenderObj(pageTemplate, obj);
         await asyncForEachSequential(prerenderedFiles, storeResult);
       } catch (e) {
         failedCount += 1;
@@ -43,7 +44,8 @@ export default async function prerenderObjs(
 }
 
 function allObjs(objClassesBlacklist) {
-  return Scrivito.Obj.all()
+  return Scrivito.Obj.onSite("default")
+    .all()
     .andNot("_objClass", "equals", objClassesBlacklist)
     .take();
 }

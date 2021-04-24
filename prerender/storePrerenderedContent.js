@@ -26,7 +26,11 @@ async function storePrerenderedContent() {
     path.join(SOURCE_DIR, "asset-manifest.json")
   );
   let filesRemoved = 0;
-  const filesToBeRemoved = ["asset-manifest.json", "_prerender_content.html"];
+  const filesToBeRemoved = [
+    "asset-manifest.json",
+    "_prerender_content.html",
+    "_page_template.html",
+  ];
   filesToBeRemoved.push(assetManifest["prerender_content.css"]);
   const prerenderContentJsPath = assetManifest["prerender_content.js"];
   filesToBeRemoved.push(

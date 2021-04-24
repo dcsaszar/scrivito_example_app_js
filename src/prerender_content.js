@@ -29,7 +29,9 @@ const SITEMAP_OBJ_CLASSES_WHITELIST = [
 
 async function prerenderContent() {
   await prerenderSitemap(SITEMAP_OBJ_CLASSES_WHITELIST, window.storeResult);
+  const pageTemplate = await (await fetch("_page_template.html")).text();
   await prerenderObjs(
+    pageTemplate,
     PRERENDER_OBJ_CLASSES_BLACKLIST,
     window.storeResult,
     window.reportError

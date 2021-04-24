@@ -83,7 +83,9 @@
   },
   "scripts": {
     "build": "webpack --env production",
-    "prerender": "SCRIVITO_PRERENDER=true npm run build && node prerender/storePrerenderedContent.js",
+    "prerender": "SCRIVITO_PRERENDER=true SCRIVITO_ORIGIN=http://localhost:8080 npm run build && node prerender/storePrerenderedContent.js",
+    "prerender:node": "SCRIVITO_PRERENDER=true npm run build && SCRIVITO_ORIGIN=http://localhost:8080 node buildNode/assets/prerender.js",
+    "prerender:compare": "SCRIVITO_PRERENDER=true SCRIVITO_ORIGIN=http://localhost:8080 npm run build && node prerender/storePrerenderedContent.js && node buildNode/assets/prerender.js && opendiff buildPrerendered buildNodePrerendered",
     "start": "webpack serve",
     "eslint": "eslint --max-warnings 0 src/ prerender/",
     "es-check": "npm run build && es-check es5 --not=build/assets/scrivito_extensions. './build/**/*.js'"
