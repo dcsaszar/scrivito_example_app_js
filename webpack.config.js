@@ -22,11 +22,10 @@ if (endpoint) {
   headersCsp["script-src"].push(`https://${endpoint}`);
 }
 
-const buildPath = "build";
-
 function webpackConfig(env = {}) {
-  const isProduction = env.production;
-  const isPrerendering = process.env.SCRIVITO_PRERENDER;
+  const { production: isProduction, isPrerendering } = env;
+
+  const buildPath = isPrerendering ? "buildPrerendering" : "build";
 
   if (
     !process.env.SCRIVITO_TENANT ||
@@ -134,15 +133,15 @@ function webpackConfig(env = {}) {
 }
 
 function generateEntry({ isPrerendering }) {
-  const entry = {
+  if (isPrerendering) {
+    return { prerender_content: "./prerender_content.js" };
+  }
+
+  return {
     index: "./index.js",
     tracking: "./tracking.js",
     scrivito_extensions: "./scrivito_extensions.js",
   };
-  if (isPrerendering) {
-    entry.prerender_content = "./prerender_content.js";
-  }
-  return entry;
 }
 
 function generatePlugins({ isProduction, isPrerendering, scrivitoOrigin }) {
@@ -200,6 +199,9 @@ function generatePlugins({ isProduction, isPrerendering, scrivitoOrigin }) {
 
   if (isProduction) {
     plugins.unshift(new CleanWebpackPlugin());
+  }
+
+  if (isProduction && !isPrerendering) {
     plugins.push(
       new ZipPlugin({
         filename: "build.zip",
@@ -208,7 +210,9 @@ function generatePlugins({ isProduction, isPrerendering, scrivitoOrigin }) {
         exclude: "asset-manifest.json",
       })
     );
-  } else {
+  }
+
+  if (!isProduction) {
     plugins.push(new webpack.SourceMapDevToolPlugin({}));
   }
 
@@ -227,4 +231,12 @@ function devServerCspHeader() {
   return builder({ directives });
 }
 
-module.exports = webpackConfig;
+function webpackConfigPrerender(env = {}) {
+  return webpackConfig({ ...env, isPrerendering: true });
+}
+
+const isPrerendering = process.env.SCRIVITO_PRERENDER;
+
+module.exports = isPrerendering
+  ? [webpackConfig, webpackConfigPrerender]
+  : webpackConfig;
