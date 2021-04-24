@@ -26,6 +26,8 @@ function webpackConfig(env = {}) {
   const { production: isProduction, isPrerendering } = env;
 
   const buildPath = isPrerendering ? "buildPrerendering" : "build";
+  const webTarget = isProduction ? ["web", "es5"] : "web";
+  const target = isPrerendering ? "node" : webTarget;
 
   if (
     !process.env.SCRIVITO_TENANT ||
@@ -49,7 +51,7 @@ function webpackConfig(env = {}) {
     mode: isProduction ? "production" : "development",
     context: path.join(__dirname, "src"),
     entry: generateEntry({ isPrerendering }),
-    target: isProduction ? ["web", "es5"] : "web",
+    target,
     module: {
       rules: [
         {
@@ -106,7 +108,7 @@ function webpackConfig(env = {}) {
     output: {
       publicPath: "/",
       filename: (chunkData) =>
-        chunkData.chunk.name === "tracking"
+        isPrerendering || chunkData.chunk.name === "tracking"
           ? "[name].js"
           : "assets/[name].[contenthash].js",
       chunkFilename: "assets/chunk-[id].[contenthash].js",
