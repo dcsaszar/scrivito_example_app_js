@@ -185,6 +185,7 @@ function generatePlugins({ isProduction, isPrerendering, scrivitoOrigin }) {
       chunks: ["scrivito_extensions"],
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
+    new WebpackManifestPlugin({ fileName: "asset-manifest.json" }),
   ];
 
   if (isPrerendering) {
@@ -197,12 +198,6 @@ function generatePlugins({ isProduction, isPrerendering, scrivitoOrigin }) {
     );
   }
 
-  if (!isProduction || isPrerendering) {
-    plugins.push(
-      new WebpackManifestPlugin({ fileName: "asset-manifest.json" })
-    );
-  }
-
   if (isProduction) {
     plugins.unshift(new CleanWebpackPlugin());
     plugins.push(
@@ -210,6 +205,7 @@ function generatePlugins({ isProduction, isPrerendering, scrivitoOrigin }) {
         filename: "build.zip",
         path: "../",
         pathPrefix: "build/",
+        exclude: "asset-manifest.json",
       })
     );
   } else {
