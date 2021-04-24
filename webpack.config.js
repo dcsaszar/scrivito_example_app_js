@@ -189,16 +189,6 @@ function generatePlugins({ isProduction, isPrerendering, scrivitoOrigin }) {
     new WebpackManifestPlugin({ fileName: "asset-manifest.json" }),
   ];
 
-  if (isPrerendering) {
-    plugins.push(
-      new HtmlWebpackPlugin({
-        filename: "_prerender_content.html",
-        template: "_prerender_content.html",
-        chunks: ["prerender_content"],
-      })
-    );
-  }
-
   if (isProduction) {
     plugins.unshift(new CleanWebpackPlugin());
   }
