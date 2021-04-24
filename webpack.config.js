@@ -41,10 +41,19 @@ function webpackConfig(env = {}) {
   }
 
   let scrivitoOrigin = "";
-  if (process.env.CONTEXT === "production") {
+  if (process.env.SCRIVITO_ORIGIN) {
+    scrivitoOrigin = process.env.SCRIVITO_ORIGIN;
+  } else if (process.env.CONTEXT === "production") {
     scrivitoOrigin = process.env.URL;
   } else if (process.env.DEPLOY_PRIME_URL) {
     scrivitoOrigin = process.env.DEPLOY_PRIME_URL;
+  }
+
+  if (isPrerendering && !scrivitoOrigin) {
+    throw new Error(
+      'The environment variable "SCRIVITO_ORIGIN" is not defined.' +
+        " Prerendered pages need a configured origin or base URL."
+    );
   }
 
   return {
