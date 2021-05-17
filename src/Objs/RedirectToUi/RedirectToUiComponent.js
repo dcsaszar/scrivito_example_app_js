@@ -3,7 +3,7 @@ import * as Scrivito from "scrivito";
 
 class RedirectToUiComponent extends React.Component {
   componentDidMount() {
-    const scrivitoUiUrl = `https://edit.scrivito.com/${window.location.origin}`;
+    const scrivitoUiUrl = `${window.location.origin}/scrivito/`;
     window.top.location.replace(scrivitoUiUrl);
   }
 
