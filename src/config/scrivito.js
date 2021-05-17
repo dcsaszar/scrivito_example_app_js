@@ -3,8 +3,15 @@ import * as Scrivito from "scrivito";
 export function configureScrivito(options) {
   const config = {
     tenant: process.env.SCRIVITO_TENANT,
-    adoptUi: true,
-    unstable: { assetUrlBase: "http://localhost:8091" },
+    adoptUi: "http://localhost:8090",
+    unstable: {
+      assetUrlBase: "http://localhost:8091",
+      trustedUiOrigins: [
+        "http://localhost:8090",
+        "http://127.0.0.1:8090",
+        "https://*.netlify.app",
+      ],
+    },
   };
 
   if (process.env.SCRIVITO_ORIGIN) {

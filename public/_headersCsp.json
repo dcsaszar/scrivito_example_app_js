@@ -13,5 +13,11 @@
   ],
   "object-src": "'none'",
   "block-all-mixed-content": true,
-  "frame-ancestors": ["'self'", "https://*.scrivito.com"]
+  "frame-ancestors": [
+    "'self'",
+    "https://*.scrivito.com",
+    "http://localhost:8090",
+    "http://127.0.0.1:8090",
+    "https://*.netlify.app"
+  ]
 }
